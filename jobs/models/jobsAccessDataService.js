@@ -66,6 +66,17 @@ const getMyJobs = async (recruiterId) => {
     }
 }
 
+// get saved jobs for specific user
+const getSavedJobs = async (userId) => {
+    try {
+        // מחפש את כל המשרות שה-userId נמצא במערך savedBy שלהן
+        let savedJobs = await Job.find({ savedBy: userId });
+        return savedJobs;
+    } catch (error) {
+        return createError("Mongoose", error.message, 500);
+    }
+};
+
 
 // update job
 
@@ -121,4 +132,4 @@ const saveJob = async (jobId, userId) => {
 
 
 
-module.exports = {createJob, getAllJobs, getJob, getMyJobs, updateJob, deleteJob,  saveJob};
+module.exports = {createJob, getAllJobs, getJob, getMyJobs, updateJob, deleteJob,  saveJob, getSavedJobs};

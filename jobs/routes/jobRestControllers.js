@@ -1,5 +1,5 @@
 const express = require("express");
-const { getAllJobs, createJob, getJob, getMyJobs, updateJob, deleteJob, saveJob } = require("../models/jobsAccessDataService");
+const { getAllJobs, createJob, getJob, getMyJobs, updateJob, deleteJob, saveJob, getSavedJobs } = require("../models/jobsAccessDataService");
 const auth = require("../../auth/authService");
 const normalizeJob = require("../helpers/nomalizeJob");
 const jobValidation = require("../validation/jobValidationService");
@@ -37,6 +37,18 @@ router.get("/my-jobs", auth, async (req, res) => {
     } catch (error) {
         // res.status(400).send(error.message);
         return handleError(res, error.status, error.message)
+    }
+});
+
+
+// Get saved jobs (חייב להיות לפני /:id!)
+router.get("/saved-jobs", auth, async (req, res) => {
+    try {
+        const userId = req.user._id; // לוקחים את ה-ID מהטוקן של המשתמש המחובר
+        let savedJobs = await getSavedJobs(userId);
+        res.status(200).send(savedJobs);
+    } catch (error) {
+        return handleError(res, error.status, error.message);
     }
 });
 

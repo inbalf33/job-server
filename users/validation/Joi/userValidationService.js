@@ -3,7 +3,8 @@ const validator = "Joi";
 
 const registerValidation = require("./registerValidation");
 const loginValidation = require("./loginValidation");
-// const validationRegistraion  = require("./registerValidation");
+const editUserValidation = require("./editUserValidation"); 
+
 
 const validateRegister = (user) => {
     if (validator === "Joi") {
@@ -26,4 +27,14 @@ const validateLogin = (user) => {
 
 }
 
-module.exports = {validateRegister, validateLogin};
+const validateEditUser = (user) => {
+    if (validator === "Joi") {
+        const { error } = editUserValidation(user);
+        if (error) {
+            return error.details.map((detail) => detail.message);
+        }
+        return "";
+    }
+};
+
+module.exports = {validateRegister, validateLogin, validateEditUser};

@@ -28,8 +28,12 @@ const jobSchema = new mongoose.Schema({
     // שאר השדות של המשרה - מחוץ ל-salary
     phone: PHONE,
     email: {...EMAIL, uniqe:false},
-    applyLink: URL,
-    image: Images, // וודא שקובץ Images.js מייצא רק Schema ולא mongoose.model
+    applyLink: {
+        type: String,
+        required: false, // הופך ללא חובה
+        trim: true,
+    },
+    image: Images,
     jobNumber: {
         type: Number,
         required: true,

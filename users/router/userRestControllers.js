@@ -2,9 +2,9 @@ const express = require("express");
 const { registerUser, getUser, getAllUsers, loginUser, updateUser, changeRecuruiterStatus, deleteUser } = require("../models/userAccessDataService");
 const auth = require("../../auth/authService");
 const returnUser = require("../helpers/returnUser");
-const { validateRegister, validateLogin } = require("../validation/Joi/userValidationService");
+const { validateRegister, validateLogin, validateEditUser} = require("../validation/Joi/userValidationService");
 const { createError, handleError  } = require("../../utils/handleErrors");
-
+const { generateUserPassword } = require("../helpers/bcrypt");
 
 const router = express.Router();
 
@@ -101,21 +101,27 @@ router.put("/:id", auth, async (req, res) => {
 
   try {
     if (userInfo._id !== id) {
-        return createError("Authorization", "Only the user can edit is details", 403)
+      return createError("Authorization", "Only the user can edit is details", 403);
     }
 
-    const errorMessage = validateRegister(updatedUser);
+    // --- כאן מחליפים ל-validateEditUser במקום validateRegister ---
+    const errorMessage = validateEditUser(updatedUser);
     if (errorMessage != "") {
-        return createError("Validation", errorMessage, 400)
+      return createError("Validation", errorMessage, 400);
     }
 
-    // אם מגיע לפה זה אומר שהכל תקין ואפשר לעדכן
+    // הצפנת הסיסמה מחדש רק אם המשתמש הקליד סיסמה חדשה
+    if (updatedUser.password) {
+      updatedUser.password = await generateUserPassword(updatedUser.password);
+    }
+
     let user = await updateUser(id, updatedUser);
-    res.status(201).send(returnUser(user));    
+    res.status(200).send(returnUser(user));    
   } catch (error) {
     return handleError(res, 400, error.message);    
   }
 });
+
 
 // update isRecuruiter status
 router.patch("/:id", auth, async (req, res) => {
